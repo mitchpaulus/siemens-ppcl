@@ -170,7 +170,7 @@ loopStatement : LOOP LPAREN
                 POS_INT RPAREN ; // Should be 0.
 
 
-gotoStatement : GOTO integer ;
+gotoStatement : GOTO POS_INT ;
 
 assignmentStatement : (POINT | LOCALVAR) EQUAL_SIGN expression ;
 
