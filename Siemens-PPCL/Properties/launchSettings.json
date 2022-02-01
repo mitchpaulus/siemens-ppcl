@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "Siemens-PPCL": {
+      "commandName": "Project",
+      "commandLineArgs": "27213.DC.AHU05.PPCL.pcl",
+      "workingDirectory": "C:\\Users\\mpaulus\\source\\repos\\Projects\\19-CITTX-002 Citibank BAS Replacement - Georgetown\\alarm audit\\GTDC PPCL\\27213.DC.AHU05"
+    }
+  }
+}
