@@ -11,11 +11,14 @@ program : line* EOF;
 
 line : POS_INT (sample? statement NL | COMMENT);
 
-COMMENT : 'C' (' '|'\t') .*? '\n' | 'C\n'  ;
+COMMENT : 'C' (' '|'\t') .*? '\r'? '\n' | 'C' '\r'? '\n' ;
 
-NL : '\n' ;
+NL : '\r'?'\n' ;
 
 fragment UPPERALPHANUM : [A-Z0-9] ;
+
+
+LOCAL : 'LOCAL' ;
 
 SAMPLE : 'SAMPLE' ;
 sample : SAMPLE LPAREN POS_INT RPAREN ;
@@ -90,6 +93,7 @@ pointStatusIndicator : ALARM | ALMACK | AUTO | DEAD | LOW | OK | DAYMOD | FAILED
 
 // See pg. 1-45 (p. 32) Table 1-5 for order of precedence.
 ALARMPRI : 'ALARMPRI' ;
+
 ATN : 'ATN' ;
 COM: 'COM' ;
 COS : 'COS' ;
@@ -99,6 +103,7 @@ SIN : 'SIN' ;
 SQRT : 'SQRT' ;
 TAN : 'TAN' ;
 TOTAL : 'TOTAL' ;
+
 
 ROOT : '.ROOT.' ;
 
@@ -118,6 +123,7 @@ XOR : '.XOR.' ;
 ONPWRT : 'ONPWRT' ;
 RELEAS : 'RELEAS' ;
 DEFINE : 'DEFINE' ;
+INITTO : 'INITTO' ;
 
 MIN : 'MIN' ;
 MAX : 'MAX' ;
@@ -128,21 +134,34 @@ MAX : 'MAX' ;
 // • Point names that begin with numbers must be prefixed with the at (@) character.
 // • Point names that are greater than 6 characters must be enclosed in double quotes.
 // • Point names that use characters other than A-Z or 0-9 must be enclosed in double quotes.
+
+// Local points defined with LOCAL can be referenced without quotes if desired.
 POINT : '"' .*? '"' |
-        [A-Z] |
-        [A-Z] UPPERALPHANUM |
-        [A-Z] UPPERALPHANUM UPPERALPHANUM |
-        [A-Z] UPPERALPHANUM UPPERALPHANUM UPPERALPHANUM |
-        [A-Z] UPPERALPHANUM UPPERALPHANUM UPPERALPHANUM UPPERALPHANUM |
-        [A-Z] UPPERALPHANUM UPPERALPHANUM UPPERALPHANUM UPPERALPHANUM UPPERALPHANUM ;
+        '$'? [A-Z] |
+        '$'? [A-Z] UPPERALPHANUM |
+        '$'? [A-Z] UPPERALPHANUM UPPERALPHANUM |
+        '$'? [A-Z] UPPERALPHANUM UPPERALPHANUM UPPERALPHANUM |
+        '$'? [A-Z] UPPERALPHANUM UPPERALPHANUM UPPERALPHANUM UPPERALPHANUM |
+        '$'? [A-Z] UPPERALPHANUM UPPERALPHANUM UPPERALPHANUM UPPERALPHANUM UPPERALPHANUM ;
 
 WS : [ \t]+ -> skip ;
+
+arithmetic_function : ATN |
+                      COM |
+                      COS |
+                      EXP |
+                      LOG |
+                      SIN |
+                      SQRT |
+                      TAN ;
 
 statement : loopStatement |
             gotoStatement |
             assignmentStatement |
             tableStatement |
             ifStatement |
+            inittoStatement |
+            localStatement |
             onStatement |
             offStatement |
             setStatement |
@@ -154,6 +173,7 @@ statement : loopStatement |
             timAvgStatement |
             waitStatement
             ;
+
 
 loopStatement : LOOP LPAREN
                 POS_INT   COMMA // Type
@@ -183,11 +203,16 @@ tableStatement : TABLE LPAREN
 
 ifStatement : IF LPAREN expression RPAREN THEN statement (ELSE statement)? ;
 
+inittoStatement : INITTO LPAREN expression COMMA POINT (COMMA POINT)* RPAREN ;
+
 onStatement : ON LPAREN (POINT | LOCALVAR) (COMMA (POINT | LOCALVAR))* RPAREN ;
 offStatement : OFF LPAREN (POINT | LOCALVAR) (COMMA (POINT | LOCALVAR))* RPAREN ;
 
 // The manual says that the value parameter can't be an integer, but I've seen it in the wild.
-setStatement : SET LPAREN (DECIMAL | POINT | LOCALVAR | integer) COMMA POINT (COMMA POINT)* RPAREN |
+
+validSetPoint : (POINT | SECNDS | SECONDS_COUNTER) ;
+
+setStatement : SET LPAREN (DECIMAL | POINT | LOCALVAR | integer) COMMA validSetPoint (COMMA validSetPoint)* RPAREN |
                SET LPAREN atPriorityStatusIndicator COMMA (DECIMAL | POINT | LOCALVAR | integer) (COMMA POINT)* RPAREN ;
 
 onpwrtStatement : ONPWRT LPAREN integer RPAREN ;
@@ -195,6 +220,8 @@ onpwrtStatement : ONPWRT LPAREN integer RPAREN ;
 releasStatement : RELEAS LPAREN (OPER | POINT) (COMMA POINT)* RPAREN ;
 
 defineStatement : DEFINE LPAREN POINT COMMA POINT RPAREN ;
+
+localStatement : LOCAL LPAREN POINT (COMMA POINT)* RPAREN ;
 
 minStatement : MIN LPAREN (POINT | DECIMAL | integer | LOCALVAR) (COMMA (POINT | DECIMAL | integer | LOCALVAR))* RPAREN ;
 maxStatement : MAX LPAREN (POINT | DECIMAL | integer | LOCALVAR) (COMMA (POINT | DECIMAL | integer | LOCALVAR))* RPAREN ;
@@ -213,6 +240,8 @@ expression :POINT |
             pointStatusIndicator |
             residentPoint |
             MILITARY_TIME |
+            arithmetic_function LPAREN expression RPAREN |
+            TOTAL LPAREN POINT RPAREN |
             LPAREN expression RPAREN |
             MINUS expression |
             expression ROOT expression |
