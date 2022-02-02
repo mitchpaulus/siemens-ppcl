@@ -20,16 +20,15 @@ NL : '\r'?'\n' ;
 
 fragment UPPERALPHANUM : [A-Z0-9] ;
 
-
-ACT : 'ACT' ;
+ACT    : 'ACT'    ;
 DBSWIT : 'DBSWIT' ;
-DEACT : 'DEACT' ;
+DEACT  : 'DEACT'  ;
 DISALM : 'DISALM' ;
-ENALM : 'ENALM' ;
+ENALM  : 'ENALM'  ;
 HLIMIT : 'HLIMIT' ;
 LLIMIT : 'LLIMIT' ;
-LOCAL : 'LOCAL' ;
-GOSUB : 'GOSUB' ;
+LOCAL  : 'LOCAL'  ;
+GOSUB  : 'GOSUB'  ;
 
 SAMPLE : 'SAMPLE' ;
 sample : SAMPLE LPAREN POS_INT RPAREN ;
@@ -38,9 +37,9 @@ TIMAVG : 'TIMAVG' ;
 WAIT : 'WAIT' ;
 
 TABLE : 'TABLE' ;
-IF : 'IF' ;
-THEN : 'THEN' ;
-ELSE : 'ELSE' ;
+IF    : 'IF'    ;
+THEN  : 'THEN'  ;
+ELSE  : 'ELSE'  ;
 
 POS_INT : [0-9]+ ;
 NEG_INT : '-' [0-9]+ ;
@@ -58,47 +57,47 @@ RETURN : 'RETURN' ;
 SET : 'SET' ;
 
 // Resident Points
-ALMCNT : 'ALMCNT' ;
-ALMCT2 : 'ALMCT2' ;
-BATT : '$BATT' ;
-CRTIME : 'CRTIME' ;
-DAY : 'DAY' ;
-DAYOFM : 'DAYOFM' ;
-LINK : 'LINK' ;
-MONTH : 'MONTH' ;
-NODENUM : 'NODE' [0-9][0-9]? ;
-PDL_MONITOR : '$PDL' ;
-SECNDS : 'SECNDS' ;
-SECONDS_COUNTER : 'SECOND' [1-7] ;
-TIME : 'TIME' ;
+ALMCNT          : 'ALMCNT'           ;
+ALMCT2          : 'ALMCT2'           ;
+BATT            : '$BATT'            ;
+CRTIME          : 'CRTIME'           ;
+DAY             : 'DAY'              ;
+DAYOFM          : 'DAYOFM'           ;
+LINK            : 'LINK'             ;
+MONTH           : 'MONTH'            ;
+NODENUM         : 'NODE' [0-9][0-9]? ;
+PDL_MONITOR     : '$PDL'             ;
+SECNDS          : 'SECNDS'           ;
+SECONDS_COUNTER : 'SECOND' [1-7]     ;
+TIME            : 'TIME'             ;
 
 residentPoint : ALMCNT | ALMCT2 | BATT | CRTIME | DAY | DAYOFM | LINK | MONTH | NODENUM | PDL_MONITOR | SECNDS | SECONDS_COUNTER | TIME ;
 
 // At (@) Priority Status Indicators
-EMER : '@EMER' ;
-NONE : '@NONE' ;
-OPER : '@OPER' ;
-PDL : '@PDL' ;
+EMER  : '@EMER'  ;
+NONE  : '@NONE'  ;
+OPER  : '@OPER'  ;
+PDL   : '@PDL'   ;
 SMOKE : '@SMOKE' ;
 
 atPriorityStatusIndicator : EMER | NONE | OPER | PDL | SMOKE ;
 
 // Point Status Indicators
-ALARM : 'ALARM' ;
+ALARM  : 'ALARM'  ;
 ALMACK : 'ALMACK' ;
-AUTO : 'AUTO' ;
-DEAD : 'DEAD' ;
-LOW : 'LOW' ;
-OK : 'OK' ;
+AUTO   : 'AUTO'   ;
+DEAD   : 'DEAD'   ;
+LOW    : 'LOW'    ;
+OK     : 'OK'     ;
 DAYMOD : 'DAYMOD' ;
 FAILED : 'FAILED' ;
-FAST : 'FAST' ;
-HAND : 'HAND' ;
+FAST   : 'FAST'   ;
+HAND   : 'HAND'   ;
 NGTMOD : 'NGTMOD' ;
-OFF : 'OFF' ;
-ON : 'ON' ;
-PRFON : 'PRFON' ;
-SLOW : 'SLOW' ;
+OFF    : 'OFF'    ;
+ON     : 'ON'     ;
+PRFON  : 'PRFON'  ;
+SLOW   : 'SLOW'   ;
 
 pointStatusIndicator : ALARM | ALMACK | AUTO | DEAD | LOW | OK | DAYMOD | FAILED | FAST | HAND | NGTMOD | OFF | ON | PRFON | SLOW ;
 
@@ -106,30 +105,30 @@ pointStatusIndicator : ALARM | ALMACK | AUTO | DEAD | LOW | OK | DAYMOD | FAILED
 // See pg. 1-45 (p. 32) Table 1-5 for order of precedence.
 ALARMPRI : 'ALARMPRI' ;
 
-ATN : 'ATN' ;
-COM: 'COM' ;
-COS : 'COS' ;
-EXP : 'EXP' ;
-LOG : 'LOG' ;
-SIN : 'SIN' ;
-SQRT : 'SQRT' ;
-TAN : 'TAN' ;
+ATN   : 'ATN'   ;
+COM   : 'COM'   ;
+COS   : 'COS'   ;
+EXP   : 'EXP'   ;
+LOG   : 'LOG'   ;
+SIN   : 'SIN'   ;
+SQRT  : 'SQRT'  ;
+TAN   : 'TAN'   ;
 TOTAL : 'TOTAL' ;
 
 
 ROOT : '.ROOT.' ;
 
-EQUAL_TO : '.EQ.' ;
-NOT_EQUAL_TO : '.NE.' ;
-LESS_THAN : '.LT.' ;
-LESS_THAN_OR_EQUAL_TO : '.LE.' ;
-GREATER_THAN : '.GT.' ;
+EQUAL_TO                 : '.EQ.' ;
+NOT_EQUAL_TO             : '.NE.' ;
+LESS_THAN                : '.LT.' ;
+LESS_THAN_OR_EQUAL_TO    : '.LE.' ;
+GREATER_THAN             : '.GT.' ;
 GREATER_THAN_OR_EQUAL_TO : '.GE.' ;
 
-AND : '.AND.' ;
+AND  : '.AND.'  ;
 NAND : '.NAND.' ;
 
-OR: '.OR.' ;
+OR  : '.OR.'  ;
 XOR : '.XOR.' ;
 
 ONPWRT : 'ONPWRT' ;
@@ -158,43 +157,36 @@ POINT : '"' .*? '"' |
 
 WS : [ \t]+ -> skip ;
 
-arithmetic_function : ATN |
-                      COM |
-                      COS |
-                      EXP |
-                      LOG |
-                      SIN |
-                      SQRT |
-                      TAN ;
+arithmetic_function : ATN | COM | COS | EXP | LOG | SIN | SQRT | TAN ;
 
-statement :
-            assignmentStatement |
-            actStatement |
-            dbswitStatement |
-            deactStatement |
-            defineStatement |
-            disalmStatement |
-            enalmStatement |
-            gosubStatement |
-            gotoStatement |
-            hlimitStatement |
-            ifStatement |
-            inittoStatement |
-            llimitStatement |
-            localStatement |
-            loopStatement |
-            maxStatement |
-            minStatement |
-            offStatement |
-            onStatement |
-            onpwrtStatement |
-            releasStatement |
-            returnStatement |
-            setStatement |
-            tableStatement |
-            timAvgStatement |
-            waitStatement
-            ;
+statement
+    : assignmentStatement
+    | actStatement
+    | dbswitStatement
+    | deactStatement
+    | defineStatement
+    | disalmStatement
+    | enalmStatement
+    | gosubStatement
+    | gotoStatement
+    | hlimitStatement
+    | ifStatement
+    | inittoStatement
+    | llimitStatement
+    | localStatement
+    | loopStatement
+    | maxStatement
+    | minStatement
+    | offStatement
+    | onStatement
+    | onpwrtStatement
+    | releasStatement
+    | returnStatement
+    | setStatement
+    | tableStatement
+    | timAvgStatement
+    | waitStatement
+    ;
 
 actStatement : ACT LPAREN POS_INT (COMMA POS_INT)* RPAREN ;
 
@@ -269,25 +261,25 @@ waitStatement : WAIT LPAREN POS_INT COMMA (POINT | LOCALVAR) COMMA (POINT | LOCA
 
 comparers : EQUAL_TO | NOT_EQUAL_TO | LESS_THAN | LESS_THAN_OR_EQUAL_TO | GREATER_THAN | GREATER_THAN_OR_EQUAL_TO ;
 
-expression :POINT |
-            integer |
-            DECIMAL |
-            LOCALVAR |
-            atPriorityStatusIndicator |
-            pointStatusIndicator |
-            residentPoint |
-            MILITARY_TIME |
-            MINUS expression |
-            PLUS expression |    // I have seen the use of unary plus in the wild.
-            arithmetic_function LPAREN expression RPAREN |
-            TOTAL LPAREN POINT RPAREN |
-            LPAREN expression RPAREN |
-            expression ROOT expression |
-            expression op=('*'|'/') expression |
-            expression op=('+'|'-') expression |
-            expression comparers expression |
-            expression (AND | NAND) expression |
-            expression (OR | XOR) expression ;
-
-
+expression
+    : POINT
+    | integer
+    | DECIMAL
+    | LOCALVAR
+    | atPriorityStatusIndicator
+    | pointStatusIndicator
+    | residentPoint
+    | MILITARY_TIME
+    | MINUS expression
+    | PLUS expression // I have seen the use of unary plus in the wild
+    | arithmetic_function LPAREN expression RPAREN
+    | TOTAL LPAREN POINT RPAREN
+    | expression ROOT expression
+    | expression op=('*'|'/') expression
+    | expression op=('+'|'-') expression
+    | expression comparers expression
+    | expression (AND | NAND) expression
+    | expression (OR | XOR) expression
+    | LPAREN expression RPAREN
+    ;
 
