@@ -24,9 +24,16 @@ namespace SiemensPPCL
 
             PPCLLexer lexer = new PPCLLexer(inputStream);
 
+            lexer.RemoveErrorListeners();
+            IAntlrErrorListener<int> lexerErrorListener = new AntlrErrorListener();
+            lexer.AddErrorListener(lexerErrorListener);
+
             CommonTokenStream tokens = new CommonTokenStream(lexer);
 
             PPCLParser parser = new PPCLParser(tokens);
+            IAntlrErrorListener<IToken> parserErrorListener = new AntlrErrorListener();
+            parser.RemoveErrorListeners();
+            parser.AddErrorListener(parserErrorListener);
 
             PPCLParser.ProgramContext? tree = parser.program();
 

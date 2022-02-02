@@ -6,6 +6,7 @@ COMMA : ',';
 EQUAL_SIGN : '=' ;
 
 MINUS : '-';
+PLUS : '+';
 
 program : line* EOF;
 
@@ -20,7 +21,15 @@ NL : '\r'?'\n' ;
 fragment UPPERALPHANUM : [A-Z0-9] ;
 
 
+ACT : 'ACT' ;
+DBSWIT : 'DBSWIT' ;
+DEACT : 'DEACT' ;
+DISALM : 'DISALM' ;
+ENALM : 'ENALM' ;
+HLIMIT : 'HLIMIT' ;
+LLIMIT : 'LLIMIT' ;
 LOCAL : 'LOCAL' ;
+GOSUB : 'GOSUB' ;
 
 SAMPLE : 'SAMPLE' ;
 sample : SAMPLE LPAREN POS_INT RPAREN ;
@@ -44,6 +53,7 @@ DECIMAL : '-'? [0-9]+ '.' [0-9]+ ;
 
 LOOP : 'LOOP' ;
 GOTO : 'GOTO' ;
+RETURN : 'RETURN' ;
 
 SET : 'SET' ;
 
@@ -157,25 +167,36 @@ arithmetic_function : ATN |
                       SQRT |
                       TAN ;
 
-statement : loopStatement |
-            gotoStatement |
+statement :
             assignmentStatement |
-            tableStatement |
+            actStatement |
+            dbswitStatement |
+            deactStatement |
+            defineStatement |
+            disalmStatement |
+            enalmStatement |
+            gosubStatement |
+            gotoStatement |
+            hlimitStatement |
             ifStatement |
             inittoStatement |
+            llimitStatement |
             localStatement |
-            onStatement |
+            loopStatement |
+            maxStatement |
+            minStatement |
             offStatement |
-            setStatement |
+            onStatement |
             onpwrtStatement |
             releasStatement |
-            defineStatement |
-            minStatement |
-            maxStatement |
+            returnStatement |
+            setStatement |
+            tableStatement |
             timAvgStatement |
             waitStatement
             ;
 
+actStatement : ACT LPAREN POS_INT (COMMA POS_INT)* RPAREN ;
 
 loopStatement : LOOP LPAREN
                 POS_INT   COMMA // Type
@@ -191,10 +212,20 @@ loopStatement : LOOP LPAREN
                 (POINT | DECIMAL | integer | LOCALVAR) COMMA // High Limit
                 POS_INT RPAREN ; // Should be 0.
 
+gosubStatement : GOSUB POS_INT LPAREN? POINT (COMMA POINT)* RPAREN? ;
 
 gotoStatement : GOTO POS_INT ;
 
-assignmentStatement : (POINT | LOCALVAR) EQUAL_SIGN expression ;
+hlimitStatement : HLIMIT LPAREN expression COMMA (POINT | LOCALVAR)+ RPAREN ;
+
+validSetPoint : (POINT | LOCALVAR | SECNDS | SECONDS_COUNTER) ;
+
+assignmentStatement : validSetPoint EQUAL_SIGN expression ;
+
+//                              type (0 or 1)     input                   low              high                output points
+dbswitStatement : DBSWIT LPAREN expression COMMA (POINT | LOCALVAR) COMMA expression COMMA expression (COMMA  (POINT | LOCALVAR))+ RPAREN ;
+
+deactStatement : DEACT LPAREN POS_INT (COMMA POS_INT)* RPAREN ;
 
 tableStatement : TABLE LPAREN
         (POINT | LOCALVAR) COMMA // Input
@@ -207,21 +238,25 @@ ifStatement : IF LPAREN expression RPAREN THEN statement (ELSE statement)? ;
 
 inittoStatement : INITTO LPAREN expression COMMA POINT (COMMA POINT)* RPAREN ;
 
-onStatement : ON LPAREN (POINT | LOCALVAR) (COMMA (POINT | LOCALVAR))* RPAREN ;
-offStatement : OFF LPAREN (POINT | LOCALVAR) (COMMA (POINT | LOCALVAR))* RPAREN ;
+llimitStatement : LLIMIT LPAREN expression COMMA (POINT | LOCALVAR)+ RPAREN ;
+
+offStatement : OFF LPAREN (POINT | LOCALVAR | atPriorityStatusIndicator) (COMMA (POINT | LOCALVAR))* RPAREN ;
+onStatement  : ON  LPAREN (POINT | LOCALVAR | atPriorityStatusIndicator) (COMMA (POINT | LOCALVAR))* RPAREN ;
 
 // The manual says that the value parameter can't be an integer, but I've seen it in the wild.
-
-validSetPoint : (POINT | SECNDS | SECONDS_COUNTER) ;
-
-setStatement : SET LPAREN (DECIMAL | POINT | LOCALVAR | integer) COMMA validSetPoint (COMMA validSetPoint)* RPAREN |
-               SET LPAREN atPriorityStatusIndicator COMMA (DECIMAL | POINT | LOCALVAR | integer) (COMMA POINT)* RPAREN ;
+setStatement : SET LPAREN expression (COMMA validSetPoint)+ RPAREN |
+               SET LPAREN atPriorityStatusIndicator COMMA expression (COMMA POINT)+ RPAREN ;
 
 onpwrtStatement : ONPWRT LPAREN integer RPAREN ;
 
-releasStatement : RELEAS LPAREN (OPER | POINT) (COMMA POINT)* RPAREN ;
+releasStatement : RELEAS LPAREN (atPriorityStatusIndicator | POINT) (COMMA POINT)* RPAREN ;
+
+returnStatement : RETURN ;
 
 defineStatement : DEFINE LPAREN POINT COMMA POINT RPAREN ;
+
+disalmStatement : DISALM LPAREN (POINT | LOCALVAR) (COMMA (POINT | LOCALVAR))* RPAREN ;
+enalmStatement :  ENALM  LPAREN (POINT | LOCALVAR) (COMMA (POINT | LOCALVAR))* RPAREN ;
 
 localStatement : LOCAL LPAREN POINT (COMMA POINT)* RPAREN ;
 
@@ -242,10 +277,11 @@ expression :POINT |
             pointStatusIndicator |
             residentPoint |
             MILITARY_TIME |
+            MINUS expression |
+            PLUS expression |    // I have seen the use of unary plus in the wild.
             arithmetic_function LPAREN expression RPAREN |
             TOTAL LPAREN POINT RPAREN |
             LPAREN expression RPAREN |
-            MINUS expression |
             expression ROOT expression |
             expression op=('*'|'/') expression |
             expression op=('+'|'-') expression |
