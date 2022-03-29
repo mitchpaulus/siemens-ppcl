@@ -16,7 +16,31 @@ public class Program
 {
     public static void Main(string[] argv)
     {
-        string filepath = argv[0];
+        int i = 0;
+
+        string filepath = "";
+        while (i < argv.Length)
+        {
+            if (argv[i] == "-h")
+            {
+                Console.Write(HelpText());
+                Environment.ExitCode = 0;
+                return;
+            }
+            else
+            {
+                filepath = argv[i];
+            }
+
+            i++;
+        }
+
+        if (string.IsNullOrWhiteSpace(filepath))
+        {
+            Console.Error.Write("No file argument passed.\n");
+            Environment.ExitCode = 1;
+            return;
+        }
 
         string fileContents = File.ReadAllText(filepath, Encoding.UTF8);
 
@@ -148,5 +172,19 @@ public class Program
         }
 
         return variableName;
+    }
+
+
+    public static string HelpText()
+    {
+        StringBuilder builder = new StringBuilder();
+
+        builder.Append("Siemens-PPCL.exe\n");
+        builder.Append("\n");
+        builder.Append("USAGE:\n");
+        builder.Append("Siemens-PPCL.exe file\n");
+        builder.Append("\n");
+        builder.Append("Analyzes a file for 'ALMACK' points.\n");
+        return builder.ToString();
     }
 }

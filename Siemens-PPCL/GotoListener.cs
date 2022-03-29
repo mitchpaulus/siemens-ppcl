@@ -5,45 +5,44 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Siemens_PPCL
+namespace Siemens_PPCL;
+
+class GotoListener : PPCLBaseListener
 {
-    class GotoListener : PPCLBaseListener
+    private Stack<string> conditions = new Stack<string>();
+
+    public StringBuilder builder = new StringBuilder();
+
+    private string CurrentMode = "Start";
+
+    public HashSet<string> GotoLocations = new HashSet<string>();
+
+
+    public override void EnterIfStatement(PPCLParser.IfStatementContext context)
     {
-        private Stack<string> conditions = new Stack<string>();
+        conditions.Push(context.expression().GetText());
+        base.EnterIfStatement(context);
+    }
 
-        public StringBuilder builder = new StringBuilder();
+    public override void ExitIfStatement([NotNull] PPCLParser.IfStatementContext context)
+    {
+        conditions.Pop();
+    }
 
-        private string CurrentMode = "Start";
+    public override void EnterGotoStatement(PPCLParser.GotoStatementContext context)
+    {
 
-        public HashSet<string> GotoLocations = new HashSet<string>();
+        string gotoLine = context.POS_INT().GetText();
 
-
-        public override void EnterIfStatement(PPCLParser.IfStatementContext context)
+        if (conditions.Any())
         {
-            conditions.Push(context.expression().GetText());
-            base.EnterIfStatement(context);
+            builder.Append($"{conditions.Peek()}: {gotoLine}\n");
+        }
+        else
+        {
+            builder.Append($"GOTO {gotoLine}"  + "\n");
         }
 
-        public override void ExitIfStatement([NotNull] PPCLParser.IfStatementContext context)
-        {
-            conditions.Pop();
-        }
-
-        public override void EnterGotoStatement(PPCLParser.GotoStatementContext context)
-        {
-
-            string gotoLine = context.POS_INT().GetText();
-
-            if (conditions.Any())
-            {
-                builder.Append($"{conditions.Peek()}: {gotoLine}\n");
-            }
-            else
-            {
-                builder.Append($"GOTO {gotoLine}"  + "\n");
-            }
-
-            GotoLocations.Add(gotoLine);
-        }
+        GotoLocations.Add(gotoLine);
     }
 }
