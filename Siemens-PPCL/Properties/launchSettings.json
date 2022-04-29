@@ -2,8 +2,8 @@
   "profiles": {
     "Siemens-PPCL": {
       "commandName": "Project",
-      "commandLineArgs": "27213.DC.AHU05.PPCL.pcl",
-      "workingDirectory": "C:\\Users\\mpaulus\\source\\repos\\Projects\\19-CITTX-002 Citibank BAS Replacement - Georgetown\\alarm audit\\GTDC PPCL\\27213.DC.AHU05"
+      "commandLineArgs": "27218.DC.CR4.ODD.PPCL.pcl",
+      "workingDirectory": "C:\\Users\\mpaulus\\source\\repos\\Projects\\19-CITTX-001 Citibank BAS Replacement - Midwest Data\\alarm_audit\\2022-04-29\\MWDC PPCL 042122"
     }
   }
 }
