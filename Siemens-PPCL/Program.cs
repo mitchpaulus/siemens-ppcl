@@ -142,7 +142,7 @@ public class Program
             }
             else
             {
-                currentList.AddRange(AllPoints(child, currentList));
+                AllPoints(child, currentList);
             }
         }
 
