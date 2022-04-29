@@ -12,9 +12,9 @@ program : line* EOF;
 
 line : POS_INT (sample? statement NL | COMMENT);
 
-// I have seen a lowercase 'c' in the wild. Could not find official documentation about
-// case sensitivity in PPCL.
-COMMENT : ('C' | 'c') (' '|'\t') .*? '\r'? '\n' | 'C' '\r'? '\n' ;
+// I have seen a lowercase 'c' in the wild. Could not find official documentation about case sensitivity in PPCL.
+// I have also seen the case where a line starts with C$LOC... and apparently parses?
+COMMENT : ('C' | 'c') (' ' | '\t' | '$') .*? '\r'? '\n' | ('C' | 'c') '\r'? '\n' ;
 
 NL : '\r'?'\n' ;
 
