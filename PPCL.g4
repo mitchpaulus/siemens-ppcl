@@ -29,6 +29,7 @@ HLIMIT : 'HLIMIT' ;
 LLIMIT : 'LLIMIT' ;
 LOCAL  : 'LOCAL'  ;
 GOSUB  : 'GOSUB'  ;
+OIP    : 'OIP'    ; // OIP = Operator interface program
 
 SAMPLE : 'SAMPLE' ;
 sample : SAMPLE LPAREN (POS_INT | POINT | LOCALVAR) RPAREN ;
@@ -178,6 +179,7 @@ statement
     | maxStatement
     | minStatement
     | offStatement
+    | operatorInterfaceProgramStatement
     | onStatement
     | onpwrtStatement
     | releasStatement
@@ -204,7 +206,7 @@ loopStatement : LOOP LPAREN
                 (POINT | DECIMAL | integer | LOCALVAR) COMMA // High Limit
                 POS_INT RPAREN ; // Should be 0.
 
-gosubStatement : GOSUB POS_INT LPAREN? POINT (COMMA POINT)* RPAREN? ;
+gosubStatement : GOSUB POS_INT LPAREN? POINT (COMMA (POINT | LOCALVAR))* RPAREN? ;
 
 gotoStatement : GOTO POS_INT ;
 
@@ -233,6 +235,12 @@ inittoStatement : INITTO LPAREN expression COMMA POINT (COMMA POINT)* RPAREN ;
 llimitStatement : LLIMIT LPAREN expression COMMA (POINT | LOCALVAR)+ RPAREN ;
 
 offStatement : OFF LPAREN (POINT | LOCALVAR | atPriorityStatusIndicator) (COMMA (POINT | LOCALVAR))* RPAREN ;
+
+
+// Note that the second argument is really a 'string' like token, but it would be ambiguous with the quoted point.
+// Not doing much with this statement for now, so just want to parse it and move on.
+operatorInterfaceProgramStatement : OIP LPAREN (POINT | LOCALVAR) COMMA (LOCALVAR | POINT) RPAREN ;
+
 onStatement  : ON  LPAREN (POINT | LOCALVAR | atPriorityStatusIndicator) (COMMA (POINT | LOCALVAR))* RPAREN ;
 
 // The manual says that the value parameter can't be an integer, but I've seen it in the wild.
