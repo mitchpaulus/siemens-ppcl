@@ -49,13 +49,13 @@ public class Program
         PPCLLexer lexer = new PPCLLexer(inputStream);
 
         lexer.RemoveErrorListeners();
-        IAntlrErrorListener<int> lexerErrorListener = new AntlrErrorListener();
+        var lexerErrorListener = new AntlrErrorListener();
         lexer.AddErrorListener(lexerErrorListener);
 
         CommonTokenStream tokens = new CommonTokenStream(lexer);
 
         PPCLParser parser = new PPCLParser(tokens);
-        IAntlrErrorListener<IToken> parserErrorListener = new AntlrErrorListener();
+        var parserErrorListener = new AntlrErrorListener();
         parser.RemoveErrorListeners();
         parser.AddErrorListener(parserErrorListener);
 
@@ -67,6 +67,12 @@ public class Program
 
         ParseTreeWalker walker = new ParseTreeWalker();
         walker.Walk(listener, tree);
+
+        if (lexerErrorListener.Errors.Any() || parserErrorListener.Errors.Any())
+        {
+            Environment.ExitCode = 1;
+            return;
+        }
 
         Dictionary<string, string> defines = new Dictionary<string, string>();
 
