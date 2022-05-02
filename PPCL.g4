@@ -23,8 +23,10 @@ fragment UPPERALPHANUM : [A-Z0-9] ;
 ACT    : 'ACT'    ;
 DBSWIT : 'DBSWIT' ;
 DEACT  : 'DEACT'  ;
+DISABL : 'DISABL' ;
 DISALM : 'DISALM' ;
 ENALM  : 'ENALM'  ;
+ENABLE : 'ENABLE' ;
 HLIMIT : 'HLIMIT' ;
 LLIMIT : 'LLIMIT' ;
 LOCAL  : 'LOCAL'  ;
@@ -166,7 +168,9 @@ statement
     | dbswitStatement
     | deactStatement
     | defineStatement
+    | disablStatement
     | disalmStatement
+    | enableStatement
     | enalmStatement
     | gosubStatement
     | gotoStatement
@@ -220,6 +224,9 @@ assignmentStatement : validSetPoint EQUAL_SIGN expression ;
 dbswitStatement : DBSWIT LPAREN expression COMMA (POINT | LOCALVAR) COMMA expression COMMA expression (COMMA  (POINT | LOCALVAR))+ RPAREN ;
 
 deactStatement : DEACT LPAREN POS_INT (COMMA POS_INT)* RPAREN ;
+
+disablStatement : DISABL LPAREN POS_INT (COMMA POS_INT)* RPAREN ;
+enableStatement : ENABLE LPAREN POS_INT (COMMA POS_INT)* RPAREN ;
 
 tableStatement : TABLE LPAREN
         (POINT | LOCALVAR) COMMA // Input
