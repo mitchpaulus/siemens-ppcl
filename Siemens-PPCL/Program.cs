@@ -111,34 +111,17 @@ public class Program
         }
 
         foreach (var point in points.OrderBy(s => s)) Console.Write($"{point}\n");
-
-        //Console.Write(listener.builder.ToString());
-
-        //Console.Write("\nUnique Lines:\n");
-
-        //List<int> sortedLines = listener.GotoLocations
-        //    .Select(int.Parse)
-        //    .OrderBy(i => i).ToList();
-
-        //foreach (int line in sortedLines)
-        //{
-        //    Console.Write($"{line}\n");
-        //}
     }
 
     public static List<string> AllPoints(IParseTree context, List<string> currentList)
     {
-        //Console.Write($"Looping through {context.ChildCount} children\n");
         for (var i = 0; i < context.ChildCount; i++)
         {
             IParseTree child = context.GetChild(i);
             if (child.GetType() == typeof(TerminalNodeImpl))
             {
-                var node = ((TerminalNodeImpl) child).Symbol;
-                if (node.Type == PPCLLexer.POINT)
-                {
-                    currentList.Add(node.Text);
-                }
+                IToken? node = ((TerminalNodeImpl) child).Symbol;
+                if (node.Type == PPCLLexer.POINT) currentList.Add(node.Text);
             }
             else
             {
