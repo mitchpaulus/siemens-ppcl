@@ -210,7 +210,8 @@ loopStatement : LOOP LPAREN
                 (POINT | DECIMAL | integer | LOCALVAR) COMMA // High Limit
                 POS_INT RPAREN ; // Should be 0.
 
-gosubStatement : GOSUB POS_INT LPAREN? POINT (COMMA (POINT | LOCALVAR))* RPAREN? ;
+gosubArgument : POINT | LOCALVAR ;
+gosubStatement : GOSUB POS_INT LPAREN? gosubArgument (COMMA gosubArgument)* RPAREN? ;
 
 gotoStatement : GOTO POS_INT ;
 

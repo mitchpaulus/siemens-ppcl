@@ -17,8 +17,15 @@ public class Program
     public static void Main(string[] argv)
     {
         int i = 0;
-
         string filepath = "";
+        int gosubLine = -1;
+
+        bool printArgPoints = false;
+        bool printFilename = false;
+
+        // List of 0 index argument numbers to go along with gosubLine
+        List<int> gosubArgs = new List<int>();
+
         while (i < argv.Length)
         {
             if (argv[i] == "-h")
@@ -26,6 +33,53 @@ public class Program
                 Console.Write(HelpText());
                 Environment.ExitCode = 0;
                 return;
+            }
+            else if (argv[i] == "--gosub")
+            {
+                // Check for next argument
+                if (i + 1 >= argv.Length)
+                {
+                    Console.Write("Error: Missing argument for --gosub\n");
+                    Environment.ExitCode = 1;
+                    return;
+                }
+                // Try parsing the argument as an integer
+                if (!int.TryParse(argv[i + 1], out gosubLine))
+                {
+                    Console.Write($"Error: Could not parse argument '{argv[i + 1]}' as an integer\n");
+                    Environment.ExitCode = 1;
+                    return;
+                }
+            }
+            else if (argv[i] == "--args")
+            {
+                // Check for next argument
+                if (i + 1 >= argv.Length)
+                {
+                    Console.Write("Error: Missing argument for --args\n");
+                    Environment.ExitCode = 1;
+                    return;
+                }
+                // Try parsing the argument as a list of comma separated integers. Return an error if it fails
+                string[] args = argv[i + 1].Split(',');
+                foreach (string arg in args)
+                {
+                    if (!int.TryParse(arg, out int argInt))
+                    {
+                        Console.Write($"Error: Could not parse argument '{arg}' as an integer\n");
+                        Environment.ExitCode = 1;
+                        return;
+                    }
+                    gosubArgs.Add(argInt);
+                }
+            }
+            else if (argv[i] == "--print-arg-points")
+            {
+                printArgPoints = true;
+            }
+            else if (argv[i] == "--print-filename" || argv[i] == "-f")
+            {
+                printFilename = true;
             }
             else
             {
@@ -108,9 +162,47 @@ public class Program
                     points.Add(replacedName);
                 }
             }
+
+            if (line.statement()?.gosubStatement() is PPCLParser.GosubStatementContext gosubStatement)
+            {
+                var lineNum = int.Parse(gosubStatement.POS_INT().GetText());
+
+                if (lineNum == gosubLine)
+                {
+                    foreach (var argNum in gosubArgs)
+                    {
+                        // Check if the length of the argument list is greater than the argument number
+                        if (argNum >= gosubStatement.gosubArgument().Length) {
+                            Console.WriteLine($"Error: Argument number {argNum} is out of range for gosub {gosubLine}");
+                            Environment.ExitCode = 1;
+                            return;
+                        }
+
+                        var pointName = gosubStatement.gosubArgument(argNum).GetText();
+                        var replacedName = RemoveQuotesIfRequired(VariableNameReplacement(pointName, defines));
+
+                        points.Add(replacedName);
+                    }
+                }
+            }
         }
 
-        foreach (var point in points.OrderBy(s => s)) Console.Write($"{point}\n");
+        foreach (var point in points.OrderBy(s => s))
+        {
+            // Check if point matches '$ARGXX'. If so, don't print it
+            if (!printArgPoints && point.StartsWith("$ARG")) continue;
+
+            if (printFilename)
+            {
+                var filename = Path.GetFileName(filepath);
+                Console.Write($"{point}\t{filename}\n");
+            }
+            else
+            {
+                Console.Write($"{point}\n");
+            }
+
+        }
     }
 
     public static List<string> AllPoints(IParseTree context, List<string> currentList)
@@ -163,7 +255,6 @@ public class Program
         return variableName;
     }
 
-
     public static string HelpText()
     {
         StringBuilder builder = new StringBuilder();
@@ -175,5 +266,13 @@ public class Program
         builder.Append("\n");
         builder.Append("Analyzes a file for 'ALMACK' points.\n");
         return builder.ToString();
+    }
+}
+
+public static class Extensions
+{
+    public static string RemoveQuotesIfRequired(this string variableName)
+    {
+        return variableName[0] == '"' ? variableName.Substring(1, variableName.Length - 2) : variableName;
     }
 }
