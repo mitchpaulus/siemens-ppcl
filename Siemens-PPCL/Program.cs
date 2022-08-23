@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -28,7 +26,7 @@ public class Program
 
         while (i < argv.Length)
         {
-            if (argv[i] == "-h")
+            if (argv[i] == "-h" || argv[i] == "--help")
             {
                 Console.Write(HelpText());
                 Environment.ExitCode = 0;
@@ -80,6 +78,11 @@ public class Program
             else if (argv[i] == "--print-filename" || argv[i] == "-f")
             {
                 printFilename = true;
+            }
+            else if (argv[i] == "--version")
+            {
+                Console.Write("0.1.0\n");
+                return;
             }
             else
             {
@@ -265,6 +268,14 @@ public class Program
         builder.Append("Siemens-PPCL.exe file\n");
         builder.Append("\n");
         builder.Append("Analyzes a file for 'ALMACK' points.\n");
+        builder.Append("OPTIONS:\n");
+        builder.Append("  -h, --help   display help and exit\n");
+        builder.Append("  --gosub INT  GOSUB line to include for strobe points\n");
+        builder.Append("  --args ARGS      0 based argument numbers, comma separated, for strobe points on GOSUB\n");
+        builder.Append("  --print-filename   Print file name along with points\n");
+        builder.Append("  --print-arg-points Print $ARG strobe points - useful for finding files with GOSUB\n");
+        builder.Append("  --version          Print version information\n");
+
         return builder.ToString();
     }
 }
