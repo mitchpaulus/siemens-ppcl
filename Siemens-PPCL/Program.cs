@@ -143,6 +143,11 @@ public class Program
 
         if (lexerErrorListener.Errors.Any() || parserErrorListener.Errors.Any())
         {
+            Console.Error.Write($"Errors processing '{filepath}'\n");
+
+            foreach (var error in lexerErrorListener.Errors) Console.Error.Write(error);
+            foreach (var error in parserErrorListener.Errors) Console.Error.Write(error);
+
             Environment.ExitCode = 1;
             return;
         }
@@ -150,6 +155,8 @@ public class Program
         Dictionary<string, string> defines = new Dictionary<string, string>();
 
         HashSet<string> points = new HashSet<string>();
+
+        HashSet<string> localVarsSet = new HashSet<string>();
 
         foreach (PPCLParser.LineContext line in listener.lines)
         {
@@ -176,13 +183,17 @@ public class Program
             {
                 var pointList = AllPoints(line, new List<string>());
 
-                foreach (var point in pointList) {
+                foreach (var point in pointList) 
+                {
                     var replacedName = RemoveQuotesIfRequired(VariableNameReplacement(point, defines));
                     points.Add(replacedName);
                 }
+
+                List<string> localVars = AllOfType(line, PPCLLexer.LOCALVAR, new List<string>());
+                foreach (var localVar in localVars) localVarsSet.Add(localVar);
             }
 
-            if (line.statement()?.gosubStatement() is PPCLParser.GosubStatementContext gosubStatement)
+            if (line.statement()?.gosubStatement() is { } gosubStatement)
             {
                 var lineNum = int.Parse(gosubStatement.POS_INT().GetText());
 
@@ -223,6 +234,29 @@ public class Program
 
         }
     }
+
+    public static List<string> AllOfType(IParseTree context, HashSet<int> childTypes, List<string> currentList)
+    {
+        for (var i = 0; i < context.ChildCount; i++)
+        {
+            IParseTree child = context.GetChild(i);
+            if (child.GetType() == typeof(TerminalNodeImpl))
+            {
+                IToken? node = ((TerminalNodeImpl) child).Symbol;
+                if (childTypes.Contains(node.Type)) currentList.Add(node.Text);
+            }
+            else
+            {
+                AllPoints(child, currentList);
+            }
+        }
+
+        return currentList;
+    }
+
+    public static List<string> AllOfType(IParseTree context, int childType, List<string> currentList) =>
+        AllOfType(context, new HashSet<int> {childType}, currentList);
+
 
     public static List<string> AllPoints(IParseTree context, List<string> currentList)
     {
