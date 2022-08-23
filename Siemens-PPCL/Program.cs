@@ -99,7 +99,23 @@ public class Program
             return;
         }
 
-        string fileContents = File.ReadAllText(filepath, Encoding.UTF8);
+        string fileContents;
+        try
+        {
+            fileContents = File.ReadAllText(filepath, Encoding.UTF8);
+        }
+        catch (FileNotFoundException)
+        {
+            Environment.ExitCode = 1;
+            Console.Error.Write($"Could not find file '{filepath}'\n");
+            return;
+        }
+        catch (Exception) 
+        {
+            Environment.ExitCode = 1;
+            Console.Error.Write($"Could not read text from file '{filepath}'\n");
+            return;
+        }
 
         AntlrInputStream inputStream = new AntlrInputStream(fileContents);
 
