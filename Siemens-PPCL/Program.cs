@@ -110,7 +110,7 @@ public class Program
             Console.Error.Write($"Could not find file '{filepath}'\n");
             return;
         }
-        catch (Exception) 
+        catch (Exception)
         {
             Environment.ExitCode = 1;
             Console.Error.Write($"Could not read text from file '{filepath}'\n");
@@ -154,28 +154,16 @@ public class Program
 
         Dictionary<string, string> defines = new Dictionary<string, string>();
 
-        HashSet<string> points = new HashSet<string>();
+        HashSet<(string Name, int PpclLineNum)> points = new();
 
         HashSet<string> localVarsSet = new HashSet<string>();
 
         foreach (PPCLParser.LineContext line in listener.lines)
         {
-            if (line.statement()?.defineStatement() is PPCLParser.DefineStatementContext defineStatement)
+            if (line.statement()?.defineStatement() is { } defineStatement)
             {
-                string firstPoint = defineStatement.POINT()[0].GetText();
-
-                if (firstPoint[0] == '"')
-                {
-                    firstPoint = firstPoint.Substring(1, firstPoint.Length - 2);
-                }
-
-                string secondPoint = defineStatement.POINT()[1].GetText();
-
-                if (secondPoint[0] == '"')
-                {
-                    secondPoint = secondPoint.Substring(1, secondPoint.Length - 2);
-                }
-
+                string firstPoint  = defineStatement.POINT()[0].GetText().StripQuotes();
+                string secondPoint = defineStatement.POINT()[1].GetText().StripQuotes();
                 defines[firstPoint] = secondPoint;
             }
 
@@ -183,10 +171,11 @@ public class Program
             {
                 var pointList = AllPoints(line, new List<string>());
 
-                foreach (var point in pointList) 
+                foreach (var point in pointList)
                 {
-                    var replacedName = RemoveQuotesIfRequired(VariableNameReplacement(point, defines));
-                    points.Add(replacedName);
+                    var replacedName = VariableNameReplacement(point, defines).StripQuotes();
+                    var tuple = (replacedName, int.Parse(line.POS_INT().GetText()));
+                    points.Add(tuple);
                 }
 
                 List<string> localVars = AllOfType(line, PPCLLexer.LOCALVAR, new List<string>());
@@ -209,27 +198,28 @@ public class Program
                         }
 
                         var pointName = gosubStatement.gosubArgument(argNum).GetText();
-                        var replacedName = RemoveQuotesIfRequired(VariableNameReplacement(pointName, defines));
+                        var replacedName = VariableNameReplacement(pointName, defines).StripQuotes();
 
-                        points.Add(replacedName);
+                        var tuple = (replacedName, int.Parse(line.POS_INT().GetText()));
+                        points.Add(tuple);
                     }
                 }
             }
         }
 
-        foreach (var point in points.OrderBy(s => s))
+        foreach (var (name, ppclLineNum) in points.OrderBy(s => s))
         {
             // Check if point matches '$ARGXX'. If so, don't print it
-            if (!printArgPoints && point.StartsWith("$ARG")) continue;
+            if (!printArgPoints && name.StartsWith("$ARG")) continue;
 
             if (printFilename)
             {
                 var filename = Path.GetFileName(filepath);
-                Console.Write($"{point}\t{filename}\n");
+                Console.Write($"{name}\t{filename}\t{ppclLineNum}\n");
             }
             else
             {
-                Console.Write($"{point}\n");
+                Console.Write($"{name}\n");
             }
 
         }
@@ -298,16 +288,6 @@ public class Program
         return result;
     }
 
-    public static string RemoveQuotesIfRequired(string variableName)
-    {
-        if (variableName[0] == '"')
-        {
-            return variableName.Substring(1, variableName.Length - 2);
-        }
-
-        return variableName;
-    }
-
     public static string HelpText()
     {
         StringBuilder builder = new StringBuilder();
@@ -332,8 +312,17 @@ public class Program
 
 public static class Extensions
 {
-    public static string RemoveQuotesIfRequired(this string variableName)
+    public static string StripQuotes(this string inputString)
     {
-        return variableName[0] == '"' ? variableName.Substring(1, variableName.Length - 2) : variableName;
+        while (true)
+        {
+            if (inputString.Length > 1 && inputString[0] == '"' && inputString[^1] == '"')
+            {
+                inputString = inputString[1..^1];
+                continue;
+            }
+
+            return inputString;
+        }
     }
 }
