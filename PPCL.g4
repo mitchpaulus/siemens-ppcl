@@ -45,13 +45,13 @@ THEN  : 'THEN'  ;
 ELSE  : 'ELSE'  ;
 
 POS_INT : [0-9]+ ;
-NEG_INT : '-' [0-9]+ ;
-integer : NEG_INT | POS_INT ;
+neg_int : MINUS POS_INT ;
+integer : neg_int | POS_INT ;
 MILITARY_TIME : [0-9][0-9]?':'[0-9][0-9];
 
 LOCALVAR : '$LOC' ('1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | '10' | '11' | '12' | '13' | '14' | '15') ;
 
-DECIMAL : '-'? [0-9]* '.' [0-9]+ ;
+DECIMAL :  [0-9]* '.' [0-9]+ ;
 
 LOOP : 'LOOP' ;
 GOTO : 'GOTO' ;
@@ -230,10 +230,10 @@ disablStatement : DISABL LPAREN POS_INT (COMMA POS_INT)* RPAREN ;
 enableStatement : ENABLE LPAREN POS_INT (COMMA POS_INT)* RPAREN ;
 
 tableStatement : TABLE LPAREN
-        (POINT | LOCALVAR) COMMA // Input
-        (POINT | LOCALVAR)       // Output
-        (COMMA (integer | DECIMAL | POINT | LOCALVAR)   // X1
-         COMMA (integer | DECIMAL | POINT | LOCALVAR))+ // Y1
+        (POINT | LOCALVAR) // Input
+        COMMA (POINT | LOCALVAR)       // Output
+        (COMMA (MINUS? (integer | DECIMAL) | POINT | LOCALVAR)   // X1
+         COMMA (MINUS? (integer | DECIMAL) | POINT | LOCALVAR))+ // Y1
         RPAREN ;
 
 ifStatement : IF LPAREN expression RPAREN THEN statement (ELSE statement)? ;
