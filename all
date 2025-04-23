@@ -1,0 +1,12 @@
+  Determining projects to restore...
+  All projects are up-to-date for restore.
+/mnt/c/Users/mpaulus/repos/siemens-ppcl/Siemens-PPCL/GotoListener.cs(16,20): warning CS0414: The field 'GotoListener.CurrentMode' is assigned but its value is never used [/mnt/c/Users/mpaulus/repos/siemens-ppcl/Siemens-PPCL/Siemens-PPCL.csproj]
+  Siemens-PPCL -> /mnt/c/Users/mpaulus/repos/siemens-ppcl/Siemens-PPCL/bin/Debug/net9.0/Siemens-PPCL.dll
+
+Build succeeded.
+
+/mnt/c/Users/mpaulus/repos/siemens-ppcl/Siemens-PPCL/GotoListener.cs(16,20): warning CS0414: The field 'GotoListener.CurrentMode' is assigned but its value is never used [/mnt/c/Users/mpaulus/repos/siemens-ppcl/Siemens-PPCL/Siemens-PPCL.csproj]
+    1 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:02.34

@@ -30,6 +30,7 @@ ENABLE : 'ENABLE' ;
 HLIMIT : 'HLIMIT' ;
 LLIMIT : 'LLIMIT' ;
 LOCAL  : 'LOCAL'  ;
+NIGHT  : 'NIGHT' ;
 GOSUB  : 'GOSUB'  ;
 OIP    : 'OIP'    ; // OIP = Operator interface program
 
@@ -165,6 +166,8 @@ arithmetic_function : ATN | COM | COS | EXP | LOG | SIN | SQRT | TAN ;
 statement
     : assignmentStatement
     | actStatement
+    | dayStatement
+    | nightStatement
     | dbswitStatement
     | deactStatement
     | defineStatement
@@ -195,6 +198,11 @@ statement
     ;
 
 actStatement : ACT LPAREN POS_INT (COMMA POS_INT)* RPAREN ;
+
+dayStatement : DAY LPAREN  point (COMMA point)* RPAREN ;
+nightStatement : NIGHT LPAREN point (COMMA point)* RPAREN ;
+
+point : POINT | LOCALVAR ;
 
 loopStatement : LOOP LPAREN
                 POS_INT   COMMA // Type
